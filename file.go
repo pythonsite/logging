@@ -12,9 +12,9 @@ type FileLogger struct {
 	logPath       string
 	logName       string
 	file          *os.File
-	warnFile      *os.File
+	warnFile      *os.File		// 针对Error,Warn,Fatal的日志单独写一个文件中
 	LogDataChan   chan *LogData
-	logSplitType  int
+	logSplitType  int		// 日志切割的方式，有以小时和以大小两种方式
 	logSplitSize  int64
 	lastSplitHour int
 }
@@ -93,6 +93,7 @@ func (f *FileLogger) Init() {
 		panic(fmt.Sprintf("open file %s failed, err:%v", filename, err))
 	}
 	f.warnFile = file
+	// 在初始化的时候单独用一个线程从channel中获取日志内容并写入到文件中
 	go f.writeLogBackground()
 }
 
